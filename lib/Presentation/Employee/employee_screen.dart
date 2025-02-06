@@ -4,8 +4,7 @@ import 'package:employee_management_app/Bloc/Employee/employee_state.dart';
 import 'package:employee_management_app/Core/AppColors/app_colors.dart';
 import 'package:employee_management_app/Core/Images/images.dart';
 import 'package:employee_management_app/Core/Strings/strings.dart';
-import 'package:employee_management_app/Presentation/Employee/add_employee_screen.dart';
-import 'package:employee_management_app/Presentation/Employee/update_employee_screen.dart';
+import 'package:employee_management_app/Presentation/Employee/add_update_employee_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -25,7 +24,7 @@ class EmployeeListScreen extends StatelessWidget {
           if (state is EmployeeLoading) {
             return Center(child: CircularProgressIndicator());
           } else if (state is EmployeeLoaded) {
-            return state.employees.length == 0
+            return state.employees.isEmpty
                 ? Center(
                     child: Image.asset(NO_EMP_IMG),
                   )
@@ -40,56 +39,76 @@ class EmployeeListScreen extends StatelessWidget {
                         ),
                       ),
                       Container(
-                        height: 500,
                         color: WHITE_COLOR,
+                        height: 300,
                         child: Expanded(
                           child: ListView.builder(
                             itemCount: state.employees.length,
                             itemBuilder: (context, index) {
                               final employee = state.employees[index];
-                              return ListTile(
-                                title: Text(employee.name),
-                                subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      employee.role,
-                                      style: TextStyle(color: GREY_COLOR),
+                              return Column(
+                                children: [
+                                  Dismissible(
+                                    key: Key(employee.name),
+                                    background: Container(
+                                      color: Colors.red,
+                                      alignment: Alignment.centerRight,
+                                      padding: EdgeInsets.only(right: 20),
+                                      child: Icon(Icons.delete,
+                                          color: WHITE_COLOR),
                                     ),
-                                    SizedBox(height: 5),
-                                    Text(
-                                      'From ${DateFormat('d MMM yyyy').format(employee.startDate)}',
-                                      style: TextStyle(color: Colors.grey),
-                                    ),
-                                  ],
-                                ),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton(
-                                      icon: Icon(Icons.edit),
-                                      onPressed: () {
+                                    direction: DismissDirection.endToStart,
+                                    onDismissed: (direction) {
+                                      context
+                                          .read<EmployeeBloc>()
+                                          .add(DeleteEmployee(index));
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                              'Employee data has been deleted'),
+                                          duration: Duration(
+                                              seconds:
+                                                  2), // Adjust duration as needed
+                                        ),
+                                      );
+                                    },
+                                    child: ListTile(
+                                      onTap: () {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) =>
-                                                UpdateEmployeeScreen(
-                                                    index: index,
-                                                    employee: employee),
+                                                AddUpdateEmployeeScreen(
+                                              employee: employee,
+                                            ),
                                           ),
                                         );
                                       },
+                                      title: Text(employee.name),
+                                      subtitle: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            employee.role,
+                                            style: TextStyle(color: GREY_COLOR),
+                                          ),
+                                          SizedBox(height: 5),
+                                          Text(
+                                            'From ${DateFormat('d MMM yyyy').format(employee.startDate)}',
+                                            style:
+                                                TextStyle(color: Colors.grey),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                    IconButton(
-                                      icon: Icon(Icons.delete),
-                                      onPressed: () {
-                                        context
-                                            .read<EmployeeBloc>()
-                                            .add(DeleteEmployee(index));
-                                      },
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                  Divider(
+                                    height: 0.0,
+                                    color: LIGHT_GREY_COLOR,
+                                  ),
+                                ],
                               );
                             },
                           ),
@@ -108,7 +127,7 @@ class EmployeeListScreen extends StatelessWidget {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => AddEmployeeScreen()),
+            MaterialPageRoute(builder: (context) => AddUpdateEmployeeScreen()),
           );
         },
       ),

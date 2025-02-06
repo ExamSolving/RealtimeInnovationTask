@@ -8,15 +8,21 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-class AddEmployeeScreen extends StatefulWidget {
+class AddUpdateEmployeeScreen extends StatefulWidget {
+  final int? index;
+  final Employee? employee; // Optional employee to edit
+
+  AddUpdateEmployeeScreen({this.index, this.employee});
+
   @override
-  _AddEmployeeScreenState createState() => _AddEmployeeScreenState();
+  _AddUpdateEmployeeScreenState createState() =>
+      _AddUpdateEmployeeScreenState();
 }
 
-class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
+class _AddUpdateEmployeeScreenState extends State<AddUpdateEmployeeScreen> {
   final TextEditingController _nameController = TextEditingController();
   String? _selectedRole;
-  DateTime? _startDate = DateTime.now();
+  DateTime? _startDate;
   DateTime? _endDate;
 
   final List<String> _roles = [
@@ -25,6 +31,22 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
     "QA Tester",
     "Product Owner"
   ];
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Check if employee exists (for updating an employee)
+    if (widget.employee != null) {
+      _nameController.text = widget.employee!.name;
+      _selectedRole = widget.employee!.role;
+      _startDate = widget.employee!.startDate;
+      _endDate = widget.employee!.endDate;
+    } else {
+      _startDate = DateTime.now();
+      // _endDate = DateTime.now().add(Duration(days: 1));
+    }
+  }
 
   void _openDatePicker(BuildContext context, bool isStartDate) {
     showDialog(
@@ -82,7 +104,7 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
 
   final _formKey = GlobalKey<FormState>();
 
-  void _addEmployee() {
+  void _addOrUpdateEmployee() {
     if (_formKey.currentState!.validate() &&
         _selectedRole != null &&
         _startDate != null &&
@@ -93,7 +115,16 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
         startDate: _startDate!,
         endDate: _endDate!,
       );
-      context.read<EmployeeBloc>().add(AddEmployee(employee));
+
+      // Check if the employee exists (updating an employee)
+      if (widget.employee != null) {
+        context
+            .read<EmployeeBloc>()
+            .add(UpdateEmployee(widget.index ?? 0, employee)); // Update event
+      } else {
+        context.read<EmployeeBloc>().add(AddEmployee(employee)); // Add event
+      }
+
       Navigator.pop(context);
     }
   }
@@ -102,7 +133,25 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(ADD_EMP_DETAILS),
+        actions: [
+          IconButton(
+              onPressed: () {
+                context
+                    .read<EmployeeBloc>()
+                    .add(DeleteEmployee(widget.index ?? 0));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Employee data has been deleted'),
+                    duration: Duration(seconds: 2), // Adjust duration as needed
+                  ),
+                );
+                Navigator.pop(context);
+              },
+              icon: Icon(Icons.delete_outline)),
+          SizedBox(width: 10),
+        ],
+        title: Text(
+            widget.employee != null ? "Edit Employee Details" : "Add Employee"),
         backgroundColor: PRIMARY_COLOR,
         foregroundColor: WHITE_COLOR,
       ),
@@ -120,14 +169,14 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
                   prefixIcon: Icon(
                     Icons.person_outline,
                     color: PRIMARY_COLOR,
-                  ), // Leading Icon
+                  ),
                   border: OutlineInputBorder(),
                 ),
               ),
             ),
             SizedBox(height: 12),
             GestureDetector(
-              onTap: _openRoleSelectionBottomSheet, // Open bottom sheet on tap
+              onTap: _openRoleSelectionBottomSheet,
               child: AbsorbPointer(
                 child: TextFormField(
                   controller: TextEditingController(text: _selectedRole),
@@ -140,7 +189,7 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
                     suffixIcon: Icon(
                       Icons.arrow_drop_down,
                       color: PRIMARY_COLOR,
-                    ), // Leading Icon
+                    ),
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -222,8 +271,11 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
                       padding: EdgeInsets.all(10),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(5))),
-                  onPressed: _addEmployee,
-                  child: Text("Save"),
+                  onPressed:
+                      _addOrUpdateEmployee, // Use the same method for both adding and updating
+                  child: Text(widget.employee != null
+                      ? "Update"
+                      : "Save"), // Change text
                 ),
               ],
             ),
@@ -273,10 +325,9 @@ class __CustomDatePickerState extends State<_CustomDatePicker> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Use Wrap widget for responsive button layout
             Wrap(
-              spacing: 8.0, // Horizontal spacing between buttons
-              runSpacing: 8.0, // Vertical spacing between buttons
+              spacing: 8.0,
+              runSpacing: 8.0,
               alignment: WrapAlignment.center,
               children: [
                 _PresetDateButton(
@@ -311,11 +362,9 @@ class __CustomDatePickerState extends State<_CustomDatePicker> {
               ],
             ),
             SizedBox(height: 16),
-
             TableCalendar(
-              daysOfWeekVisible:
-                  false, // Hide the weekdays' labels (Mon, Tue, etc.)
-              weekNumbersVisible: false, // Disable week numbers
+              daysOfWeekVisible: false,
+              weekNumbersVisible: false,
               focusedDay: selectedDate,
               firstDay: DateTime(2000),
               lastDay: DateTime(2100),
@@ -334,18 +383,14 @@ class __CustomDatePickerState extends State<_CustomDatePicker> {
                 ),
               ),
               headerStyle: HeaderStyle(
-                formatButtonVisible:
-                    false, // Hides the button to change format (e.g., week vs month view)
-                titleCentered: true, // Ensures the title is centered
-                leftChevronIcon: Icon(Icons.arrow_left), // Customize left arrow
-                rightChevronIcon:
-                    Icon(Icons.arrow_right), // Customize right arrow
+                formatButtonVisible: false,
+                titleCentered: true,
+                leftChevronIcon: Icon(Icons.arrow_left),
+                rightChevronIcon: Icon(Icons.arrow_right),
               ),
-              // Optionally hide other UI elements here
             ),
             SizedBox(height: 16),
             Divider(),
-
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -362,6 +407,7 @@ class __CustomDatePickerState extends State<_CustomDatePicker> {
                           borderRadius: BorderRadius.circular(5))),
                   onPressed: () {
                     widget.onDateSelected(selectedDate);
+
                     Navigator.pop(context);
                   },
                   child: Text("Save"),
@@ -391,11 +437,9 @@ class _PresetDateButton extends StatelessWidget {
         elevation: 0.0,
         foregroundColor: isSelected ? WHITE_COLOR : PRIMARY_COLOR,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-        backgroundColor: isSelected
-            ? PRIMARY_COLOR
-            : SECONDARY_COLOR, // Change color based on selection
+        backgroundColor: isSelected ? PRIMARY_COLOR : SECONDARY_COLOR,
         padding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-        minimumSize: Size(120, 50), // Minimum button size
+        minimumSize: Size(120, 50),
       ),
       child: Text(label, style: TextStyle(fontSize: 12)),
     );

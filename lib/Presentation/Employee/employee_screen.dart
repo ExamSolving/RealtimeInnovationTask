@@ -41,77 +41,73 @@ class EmployeeListScreen extends StatelessWidget {
                       Container(
                         color: WHITE_COLOR,
                         height: 300,
-                        child: Expanded(
-                          child: ListView.builder(
-                            itemCount: state.employees.length,
-                            itemBuilder: (context, index) {
-                              final employee = state.employees[index];
-                              return Column(
-                                children: [
-                                  Dismissible(
-                                    key: Key(employee.name),
-                                    background: Container(
-                                      color: Colors.red,
-                                      alignment: Alignment.centerRight,
-                                      padding: EdgeInsets.only(right: 20),
-                                      child: Icon(Icons.delete,
-                                          color: WHITE_COLOR),
-                                    ),
-                                    direction: DismissDirection.endToStart,
-                                    onDismissed: (direction) {
-                                      context
-                                          .read<EmployeeBloc>()
-                                          .add(DeleteEmployee(index));
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                              'Employee data has been deleted'),
-                                          duration: Duration(
-                                              seconds:
-                                                  2), // Adjust duration as needed
+                        child: ListView.builder(
+                          itemCount: state.employees.length,
+                          itemBuilder: (context, index) {
+                            final employee = state.employees[index];
+                            return Column(
+                              children: [
+                                Dismissible(
+                                  key: Key(employee.name),
+                                  background: Container(
+                                    color: Colors.red,
+                                    alignment: Alignment.centerRight,
+                                    padding: EdgeInsets.only(right: 20),
+                                    child:
+                                        Icon(Icons.delete, color: WHITE_COLOR),
+                                  ),
+                                  direction: DismissDirection.endToStart,
+                                  onDismissed: (direction) {
+                                    context
+                                        .read<EmployeeBloc>()
+                                        .add(DeleteEmployee(index));
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                            'Employee data has been deleted'),
+                                        duration: Duration(
+                                            seconds:
+                                                2), // Adjust duration as needed
+                                      ),
+                                    );
+                                  },
+                                  child: ListTile(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              AddUpdateEmployeeScreen(
+                                            employee: employee,
+                                          ),
                                         ),
                                       );
                                     },
-                                    child: ListTile(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                AddUpdateEmployeeScreen(
-                                              employee: employee,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      title: Text(employee.name),
-                                      subtitle: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            employee.role,
-                                            style: TextStyle(color: GREY_COLOR),
-                                          ),
-                                          SizedBox(height: 5),
-                                          Text(
-                                            'From ${DateFormat('d MMM yyyy').format(employee.startDate)}',
-                                            style:
-                                                TextStyle(color: Colors.grey),
-                                          ),
-                                        ],
-                                      ),
+                                    title: Text(employee.name),
+                                    subtitle: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          employee.role,
+                                          style: TextStyle(color: GREY_COLOR),
+                                        ),
+                                        SizedBox(height: 5),
+                                        Text(
+                                          'From ${DateFormat('d MMM yyyy').format(employee.startDate)}',
+                                          style: TextStyle(color: Colors.grey),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  Divider(
-                                    height: 0.0,
-                                    color: LIGHT_GREY_COLOR,
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
+                                ),
+                                Divider(
+                                  height: 0.0,
+                                  color: LIGHT_GREY_COLOR,
+                                ),
+                              ],
+                            );
+                          },
                         ),
                       ),
                     ],

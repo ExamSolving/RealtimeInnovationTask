@@ -10,7 +10,7 @@ import 'package:table_calendar/table_calendar.dart';
 
 class AddUpdateEmployeeScreen extends StatefulWidget {
   final int? index;
-  final Employee? employee; // Optional employee to edit
+  final Employee? employee;
 
   AddUpdateEmployeeScreen({this.index, this.employee});
 
@@ -36,7 +36,6 @@ class _AddUpdateEmployeeScreenState extends State<AddUpdateEmployeeScreen> {
   void initState() {
     super.initState();
 
-    // Check if employee exists (for updating an employee)
     if (widget.employee != null) {
       _nameController.text = widget.employee!.name;
       _selectedRole = widget.employee!.role;
@@ -44,7 +43,6 @@ class _AddUpdateEmployeeScreenState extends State<AddUpdateEmployeeScreen> {
       _endDate = widget.employee!.endDate;
     } else {
       _startDate = DateTime.now();
-      // _endDate = DateTime.now().add(Duration(days: 1));
     }
   }
 
@@ -68,7 +66,6 @@ class _AddUpdateEmployeeScreenState extends State<AddUpdateEmployeeScreen> {
     );
   }
 
-  // Open a bottom sheet to select a role
   void _openRoleSelectionBottomSheet() {
     showModalBottomSheet(
       context: context,
@@ -88,10 +85,10 @@ class _AddUpdateEmployeeScreenState extends State<AddUpdateEmployeeScreen> {
                         setState(() {
                           _selectedRole = _roles[index];
                         });
-                        Navigator.pop(context); // Close the bottom sheet
+                        Navigator.pop(context);
                       },
                     ),
-                    Divider(), // Divider between list items
+                    Divider(),
                   ],
                 );
               },
@@ -109,6 +106,8 @@ class _AddUpdateEmployeeScreenState extends State<AddUpdateEmployeeScreen> {
         _selectedRole != null &&
         _startDate != null &&
         _endDate != null) {
+      FocusScope.of(context).unfocus();
+
       final employee = Employee(
         name: _nameController.text,
         role: _selectedRole!,
@@ -116,16 +115,19 @@ class _AddUpdateEmployeeScreenState extends State<AddUpdateEmployeeScreen> {
         endDate: _endDate!,
       );
 
-      // Check if the employee exists (updating an employee)
       if (widget.employee != null) {
         context
             .read<EmployeeBloc>()
-            .add(UpdateEmployee(widget.index ?? 0, employee)); // Update event
+            .add(UpdateEmployee(widget.index ?? 0, employee));
       } else {
-        context.read<EmployeeBloc>().add(AddEmployee(employee)); // Add event
+        context.read<EmployeeBloc>().add(AddEmployee(employee));
       }
 
-      Navigator.pop(context);
+      Future.delayed(Duration(milliseconds: 300), () {
+        if (context.mounted) {
+          Navigator.pop(context);
+        }
+      });
     }
   }
 
@@ -142,7 +144,7 @@ class _AddUpdateEmployeeScreenState extends State<AddUpdateEmployeeScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Employee data has been deleted'),
-                    duration: Duration(seconds: 2), // Adjust duration as needed
+                    duration: Duration(seconds: 2),
                   ),
                 );
                 Navigator.pop(context);
@@ -304,15 +306,15 @@ class __CustomDatePickerState extends State<_CustomDatePicker> {
   void initState() {
     super.initState();
     selectedDate = widget.initialDate ?? DateTime.now();
-    selectedButton = "Today"; // Set default to "Today"
+    selectedButton = "Today";
   }
 
   void _setDate(DateTime date, String button) {
     setState(() {
       selectedDate = date;
-      selectedButton = button; // Update selected button
+      selectedButton = button;
     });
-    widget.onDateSelected(selectedDate); // Update parent state immediately
+    widget.onDateSelected(selectedDate);
   }
 
   @override

@@ -1,6 +1,7 @@
 import 'package:employee_management_app/Bloc/Employee/employee_bloc.dart';
 import 'package:employee_management_app/Bloc/Employee/employee_event.dart';
 import 'package:employee_management_app/Core/AppColors/app_colors.dart';
+import 'package:employee_management_app/Core/Strings/strings.dart';
 import 'package:employee_management_app/Data/Models/Employee/employee.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -100,7 +101,11 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Add Employee Details")),
+      appBar: AppBar(
+        title: Text(ADD_EMP_DETAILS),
+        backgroundColor: PRIMARY_COLOR,
+        foregroundColor: WHITE_COLOR,
+      ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
         child: Column(
@@ -108,11 +113,10 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
             Form(
               key: _formKey,
               child: TextFormField(
-                validator: (value) =>
-                    value!.isEmpty ? "Enter employee name" : null,
+                validator: (value) => value!.isEmpty ? ENTER_EMP_NAME : null,
                 controller: _nameController,
                 decoration: InputDecoration(
-                  hintText: 'Employee Name',
+                  hintText: EMP_NAME,
                   prefixIcon: Icon(
                     Icons.person_outline,
                     color: PRIMARY_COLOR,
@@ -341,34 +345,29 @@ class __CustomDatePickerState extends State<_CustomDatePicker> {
             ),
             SizedBox(height: 16),
             Divider(),
+
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Text('Test'),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text("Cancel")),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: PRIMARY_COLOR,
-                          foregroundColor: WHITE_COLOR,
-                          elevation: 0.0,
-                          padding: EdgeInsets.all(10),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(5))),
-                      onPressed: () {
-                        widget.onDateSelected(selectedDate);
-                        Navigator.pop(context);
-                      },
-                      child: Text("Save"),
-                    ),
-                  ],
-                )
+                TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text("Cancel")),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: PRIMARY_COLOR,
+                      foregroundColor: WHITE_COLOR,
+                      elevation: 0.0,
+                      padding: EdgeInsets.all(10),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5))),
+                  onPressed: () {
+                    widget.onDateSelected(selectedDate);
+                    Navigator.pop(context);
+                  },
+                  child: Text("Save"),
+                ),
               ],
-            ),
+            )
           ],
         ),
       ),

@@ -8,7 +8,8 @@ class UpdateEmployeeScreen extends StatefulWidget {
   final int index;
   final Employee employee;
 
-  UpdateEmployeeScreen({required this.index, required this.employee});
+  const UpdateEmployeeScreen(
+      {super.key, required this.index, required this.employee});
 
   @override
   _UpdateEmployeeScreenState createState() => _UpdateEmployeeScreenState();

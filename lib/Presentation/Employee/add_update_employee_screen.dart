@@ -12,7 +12,7 @@ class AddUpdateEmployeeScreen extends StatefulWidget {
   final int? index;
   final Employee? employee;
 
-  AddUpdateEmployeeScreen({this.index, this.employee});
+  const AddUpdateEmployeeScreen({super.key, this.index, this.employee});
 
   @override
   _AddUpdateEmployeeScreenState createState() =>
@@ -292,7 +292,8 @@ class _CustomDatePicker extends StatefulWidget {
   final DateTime? initialDate;
   final Function(DateTime) onDateSelected;
 
-  _CustomDatePicker({required this.initialDate, required this.onDateSelected});
+  const _CustomDatePicker(
+      {required this.initialDate, required this.onDateSelected});
 
   @override
   __CustomDatePickerState createState() => __CustomDatePickerState();
@@ -428,7 +429,7 @@ class _PresetDateButton extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
 
-  _PresetDateButton(
+  const _PresetDateButton(
       {required this.label, required this.isSelected, required this.onTap});
 
   @override

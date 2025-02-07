@@ -10,6 +10,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
 class EmployeeListScreen extends StatelessWidget {
+  const EmployeeListScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -26,7 +26,14 @@ class EmployeeListScreen extends StatelessWidget {
           } else if (state is EmployeeLoaded) {
             return state.employees.isEmpty
                 ? Center(
-                    child: Image.asset(NO_EMP_IMG),
+                    child: Image.asset(
+                      NO_EMP_IMG,
+                      fit: BoxFit.cover, // Ensure proper scaling
+                      errorBuilder: (context, error, stackTrace) {
+                        return Icon(Icons
+                            .image_not_supported); // Fallback in case of error
+                      },
+                    ),
                   )
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

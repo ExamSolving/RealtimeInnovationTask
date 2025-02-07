@@ -366,7 +366,7 @@ class __CustomDatePickerState extends State<_CustomDatePicker> {
             ),
             SizedBox(height: 16),
             TableCalendar(
-              daysOfWeekVisible: false,
+              daysOfWeekVisible: true,
               weekNumbersVisible: false,
               focusedDay: selectedDate,
               firstDay: DateTime(2000),
